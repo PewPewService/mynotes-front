@@ -1,24 +1,14 @@
-# mynotes-front
+# mynotes-frontend
 
-## Project setup
+## heroku
 ```
-npm install
+https://maa-mynotes.herokuapp.com/
 ```
-
-### Compiles and hot-reloads for development
+## backend-git:
 ```
-npm run serve
+nothing yet
 ```
-
-### Compiles and minifies for production
+## backend-hosting:
 ```
-npm run build
+nothing yet
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
