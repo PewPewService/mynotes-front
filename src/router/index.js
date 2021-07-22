@@ -32,13 +32,13 @@ const routes = [
   {
     path: '/note/edit',
     name: 'NoteEditing',
-    component : () => import('../views/NoteEditingForm.vue')
+    component: () => import('../views/NoteCreationForm.vue')
   },
 
   {
     path: '/search',
     name: 'Search',
-    component: () => import('../views/SearchPage.vue')
+    component: HomePage
   }
 ]
 

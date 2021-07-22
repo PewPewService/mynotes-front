@@ -1,7 +1,7 @@
 <template>
     <div class="w-75 h-75 border shadow mx-auto my-auto">
         <p class="mt-3 w-75 text mx-auto font-weight-bold h2 mb-5">
-            {{ FoundNote.id ? 'Edit the note' : 'Add a note' }}
+            Add a note
         </p>
         <p class="mt-3 w-75 text mx-auto text-left font-weight-bold">
             Name of the note:
@@ -11,7 +11,6 @@
             placeholder="Enter the name of the note here"
             type="text"
             class="w-75 mx-auto"
-            :value="FoundNote.name"
         />
         <span
             id="errorName"
@@ -24,37 +23,11 @@
             id="NoteText"
             placeholder="And text here"
             class="w-75 mx-auto"
-            :value="FoundNote.text"
         >
         </b-textarea>
         <p class="mt-3 w-75 text-left mx-auto font-weight-bold">
             Images:
         </p>
-
-
-        <b-carousel
-            class="w-75 mx-auto carousel mb-3"
-            id="carousel-1"
-            :hidden="FoundNote.images.length<1 || !FoundNote.id"
-            :interval="0"
-            no-animation
-            :controls="(FoundNote.images.length > 1) ? true : false"
-            :indicators="(FoundNote.images.length > 1) ? true : false"
-            style="text-shadow: 1px 1px 2px #333;"
-        >
-            <b-carousel-slide
-                class="carousel-slide"
-                v-for="image in FoundNote.images.length"
-                :key="image"
-                :img-src="FoundNote.images[image-1]"
-            >
-                <b-button
-                    class="DeleteImageButton"
-                    @click="DeleteImage(image-1)"
-                />
-            </b-carousel-slide>
-        </b-carousel> 
-
 
        <div class="w-75 mx-auto">
            <div class="input-group">
@@ -80,7 +53,7 @@
         <b-form-tags
             class="w-75 mx-auto"
             :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
-            v-model="FoundNote.tags"
+            v-model="AddingNote.tags"
             separator=" "
             placeholder="Enter new tags separated by space"
             remove-on-delete
@@ -100,16 +73,8 @@
             variant="primary"
             @click="VerifyNote"
         >
-            {{ FoundNote.id ? 'Edit' : 'Add' }}
+            Add
         </b-button>
-        <p>
-            <span class="mt-3 mb-5 InputError">
-                {{NoteResponseError.data}}
-            </span>
-            <span class="mt-3 mb-5 InputSuccess">
-                {{NoteResponseSuccess.data}}
-            </span>
-        </p>
     </div>
 </template>
 
@@ -119,109 +84,53 @@ import { actionTypes, getterTypes, moduleName } from '../store/modules/notes';
 
 export default {
     name: "NoteCreationForm",
-    
-    async mounted(){
-        await this.setFoundNote();
-        this.ImagesEventListener();
+    mounted(){
+        document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+            let name ="";
+            for (let file of document.getElementById("NoteImages").files){
+                name += file.name + " ";
+            }
+            let nextSibling = e.target.nextElementSibling; 
+            nextSibling.innerText = name;
+        });
     },
 
     data(){
         return{
-            Note: {
+            AddingNote: {
                 id: '',
                 name: '',
                 text: '',
                 tags: [],
-                images: [],
-                pinned: false, 
-            },
-            FoundNote: {
-                id: '',
-                name: '',
-                text: '',
-                tags: [],
-                images: [],
-                pinned: false, 
-            },
+                images: []
+            }
         }
     },
     
     computed: {
-        ...mapGetters(moduleName, [
-            getterTypes.GETTER_NOTE_RESPONSE_ERROR,
-            getterTypes.GETTER_NOTE_RESPONSE_SUCCESS,
-            getterTypes.GETTER_EDITING_NOTE,
-        ]),
-        NoteResponseError(){
-            return this[getterTypes.GETTER_NOTE_RESPONSE_ERROR];
-        },
-        NoteResponseSuccess(){
-            return this[getterTypes.GETTER_NOTE_RESPONSE_SUCCESS];
-        },
-        /*FoundNote(){
-            return this[getterTypes.GETTER_EDITING_NOTE];
-        }*/
+        ...mapGetters(moduleName, [ getterTypes.GETTER_NOTE_RESPONSE ]),
+        NoteResponse(){
+            return this[getterTypes.GETTER_NOTE_RESPONSE];
+        }
     },
 
     methods: {
-        ...mapActions(moduleName, [
-            actionTypes.ACTION_ADD_NOTE,
-            actionTypes.ACTION_GET_NOTE,
-            actionTypes.ACTION_EDIT_NOTE
-        ]),
-
-        async setFoundNote(){
-            let id = this.$route.query.id;
-            await this[actionTypes.ACTION_GET_NOTE] (id ? id : 0);
-            this.FoundNote = this[getterTypes.GETTER_EDITING_NOTE];
-            //this.Note = this.FoundNote;
-        },
-
-        ImagesEventListener(){
-            document.querySelector('.custom-file-input').addEventListener('change', function (e) {
-                let name ="";
-                for (let file of document.getElementById("NoteImages").files){
-                    name += file.name + " ";
-                }
-                let nextSibling = e.target.nextElementSibling;
-                nextSibling.innerText = name;
-            });
-        },
-
-        DeleteImage(id){
-            if (confirm('r u sure?')){
-                this.FoundNote.images.splice(id,1);
-                if (!this.FoundNote.images.length) {
-                    document.querySelector('.carousel').style="display:none";
-                }
-            }
-        },
-
-        async AddOrEditNote(){
-            if (this.FoundNote.id){
-                this.Note.id = this.FoundNote.id;
-                await this[actionTypes.ACTION_EDIT_NOTE] (this.Note);
-            }
-            else await this[actionTypes.ACTION_ADD_NOTE] (this.Note);
-            if (this[getterTypes.GETTER_NOTE_RESPONSE_SUCCESS]) {
-                this.$router.push({name: 'Home'});
-            }
-        },
+        ...mapActions(moduleName, [ actionTypes.ACTION_ADD_NOTE ]),
 
         async ImagesToBase64(images){
-            this.Note.images = this.FoundNote.id ? this.FoundNote.images : [];
+            this.AddingNote.images = [];
             if (images.length) {
                 for (let i=0; i<images.length; i++){
                     let reader = new FileReader();
                     reader.onload = (e) =>{
-                        this.Note.images.push(e.target.result);
-                        if (i==images.length-1) this.AddOrEditNote();
+                        this.AddingNote.images.push(e.target.result);
+                        if (i==images.length-1) this[actionTypes.ACTION_ADD_NOTE] (this.AddingNote);
                     }
                     reader.readAsDataURL(images[i]);
                 }
             }
             else {
-                this.AddOrEditNote ();
+                this[actionTypes.ACTION_ADD_NOTE] (this.AddingNote);
             }
             
         },
@@ -251,17 +160,14 @@ export default {
             return result;
         },
 
-        VerifyNote(){
+        async VerifyNote(){
             let NoteNameField = document.querySelector("#NoteName");
             let NoteTextField = document.querySelector("#NoteText");
             let NoteImages = document.querySelector("#NoteImages").files;
             let NoteName = this.CheckName(NoteNameField);
-            console.log(this.FoundNote);
             if (!(NoteName && this.CheckContent(NoteTextField, NoteImages))) return;
-            this.Note.name = NoteName;
-            this.Note.text = NoteTextField.value.trim();
-            this.Note.tags = this.FoundNote.tags;
-            console.log(this.FoundNote);
+            this.AddingNote.name = NoteName;
+            this.AddingNote.text = NoteTextField.value.trim();
             this.ImagesToBase64(NoteImages);
         }
     }
@@ -273,14 +179,6 @@ export default {
     .w-75{
         width: 90% !important;
     }
-}
-
-.DeleteImageButton{
-    height: 2rem;
-    width: 2rem;
-    background-image: url("../assets/delete.png");
-    background-size: contain;
-    background-color: red;
 }
 
 .custom-file-input.selected:lang(en)::after {
@@ -296,9 +194,5 @@ export default {
 }
 .custom-file-label{
     padding-right: 6rem;
-}
-
-.carousel, .carousel-slide{
-    height: 30rem !important;
 }
 </style>
