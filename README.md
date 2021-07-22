@@ -2,11 +2,11 @@
 
 ## heroku
 ```
-https://maa-mynotes.herokuapp.com/
+nothing yet
 ```
 ## backend-git:
 ```
-nothing yet
+https://github.com/PewPewService/MyNotesBackEnd
 ```
 ## backend-hosting:
 ```
