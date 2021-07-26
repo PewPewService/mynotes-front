@@ -1,18 +1,29 @@
 <template>
   <div>
     <div
+      id="Popup"
+      ref="Popup"
+      class="invisible"
+    >
+      <span 
+        id="PopupMessage"
+        ref="PopupMessage"
+      />
+    </div>
+    <div
       v-for="Notes in this.Notes"
       :key="Notes.name"
       :id="Notes.name"
+      :ref="Notes.name"
       :hidden="!Notes.notes.length"
     >
-      <span class="mt-3 mb-3 w-75 mx-auto bold h2"> {{Notes.name.replace('_',' ')}} </span>
+      <span class="mt-3 mb-3 mx-auto bold h2"> {{Notes.name.replace('_',' ')}} </span>
       <b-card-group deck class="flex-wrap justify-content-around">
         <b-card
           v-for="Note in Notes.notes"
           :key="Note.id"
           :header="Note.name"
-          class="FlexCard mb-4 mx-auto"
+          class="flex-card mb-4 mx-auto"
         >
 
         <b-carousel
@@ -25,50 +36,50 @@
             style="text-shadow: 1px 1px 2px #333;"
         >
             <b-carousel-slide
-                class="carousel-slide"
                 v-for="image in Note.images.length"
                 :key="image"
                 :img-src="Note.images[image-1]"
+                class="carousel-slide"
             >
             </b-carousel-slide>
         </b-carousel>
 
-          <div class="NoteManagementButtonsField">
+          <div class="note-management-buttons-field">
             <b-button
               :id="Note.id"
-              :class="'NoteManagementButton NoteManagementButton_Pin'.concat(Note.pinned ?
-               ' NoteManagementButton_Unpin': '')"
+              :class="'note-management-button note-management-button-pin'.concat(Note.pinned ?
+               ' note-management-button-unpin': '')"
               :title="Note.pinned ? 'unpin' : 'pin' "
               @click="PinNote"
             /> 
             <b-button 
               :id="Note.id"
-              class="NoteManagementButton NoteManagementButton_Edit"
+              class="note-management-button note-management-button-edit"
               title="edit"
               @click="EditNote"
             />
             <b-button
               :id="Note.id"
-              class="NoteManagementButton NoteManagementButton_Copy"
+              class="note-management-button note-management-button-copy"
               title="copy"
               @click="CopyNote"
             />
             <b-button
               :id="Note.id"
-              class="NoteManagementButton NoteManagementButton_Delete"
+              class="note-management-button note-management-button-delete"
               title="delete"
               @click="DeleteNote"
             />
           </div>
 
           <div
-            class="NoteTagsField mx-auto"
             :hidden="!Note.tags.length"
+            class="note-tags-field mx-auto"
           >
             <span
-              class="NoteTag ml-1 mr-1"
               v-for="tag in Note.tags"
               :key="tag"
+              class="note-tag ml-1 mr-1"
               @click="SearchByTag(tag)"
             >{{tag}}</span>
           </div>
@@ -80,46 +91,46 @@
       </b-card-group>
       
       <div
-        class="w-100 mx-auto mt-3 mb-3"
         :id="'pagination'+Notes.name"
-        :hidden="PagesCount(Notes.name)<2"
+        :hidden="PagesCount(Notes.name) < 2"
+        class="w-100 mx-auto mt-3 mb-3"
       >
       <b-button
-        class="paginationButton ml-1 mr-1"
-        @click="firstPage(Notes.name)"
         :disabled="CurrentPage(Notes.name) == 1"
+        class="pagination-button ml-1 mr-1"
+        @click="firstPage(Notes.name)"
       > {{Pagination.start}} </b-button>
       <b-button
-        class="paginationButton ml-1 mr-1"
+        :disabled="CurrentPage(Notes.name) == 1"
+        class="pagination-button ml-1 mr-1"
         @click="prevPage(Notes.name)"
-        :disabled="CurrentPage(Notes.name)==1"
       > {{Pagination.prev}} </b-button>
 
       <b-button
-        class="paginationButton ml-1 mr-1"
         v-for="n in 5"
         :key="n"
         :disabled="n == 3"
-        :hidden="(n-3+CurrentPage(Notes.name) > PagesCount(Notes.name)) || (n-3+CurrentPage(Notes.name) < 1)"
+        :hidden="(n-3 + CurrentPage(Notes.name) > PagesCount(Notes.name)) || (n-3 + CurrentPage(Notes.name) < 1)"
+        class="pagination-button ml-1 mr-1"
         @click="goToPage(Notes.name, n-3 + CurrentPage(Notes.name))"
-      > {{n-3+CurrentPage(Notes.name)}}</b-button>
+      > {{n-3 + CurrentPage(Notes.name)}}</b-button>
 
       <b-button
-        class="paginationButton ml-1 mr-1"
-        :disabled="CurrentPage(Notes.name)==PagesCount(Notes.name)"
+        :disabled="CurrentPage(Notes.name) == PagesCount(Notes.name)"
+        class="pagination-button ml-1 mr-1"
         @click="nextPage(Notes.name)"
       > {{Pagination.next}} </b-button>
       <b-button
-        class="paginationButton ml-1 mr-1"
-        :disabled="CurrentPage(Notes.name)==PagesCount(Notes.name)"
+        class="pagination-button ml-1 mr-1"
+        :disabled="CurrentPage(Notes.name) == PagesCount(Notes.name)"
         @click="lastPage(Notes.name)"
       > {{Pagination.end}} </b-button>
       </div>
     </div>
     
     <div
-      class="mt-3 w-75 mx-auto"
       :hidden="NotesFound"
+      class="mt-3 mx-auto"
     > Wow, such empty </div>
   </div>
 </template>
@@ -127,7 +138,6 @@
 <script>
 import { mapActions, mapGetters } from "vuex"
 import { moduleName, getterTypes, actionTypes } from "../store/modules/notes"
-import Popup from "./PopUp.vue";
 
 export default {
   name: 'Home',
@@ -198,45 +208,30 @@ export default {
         actionTypes.ACTION_DELETE_NOTE
     ]),
 
-    // test
     async ConfirmAction(message){
         return await this.$bvModal.msgBoxConfirm(message)
           .then(value => {
             return value;
           })
     },
-    //test
 
-    // PopUpMessage(message = ''){
-    //   if (!message) message = this[getterTypes.GETTER_NOTE_RESPONSE_ERROR].data ? 
-    //       this[getterTypes.GETTER_NOTE_RESPONSE_ERROR].data : this[getterTypes.GETTER_NOTE_RESPONSE_SUCCESS].data;
-    //   let popupBackground = document.querySelector("#PopupBackground");
-    //   let popupMessage = document.querySelector("#PopupMessage");
-    //   popupMessage.innerHTML = message;
-    //   popupBackground.classList.remove("invisible");
-    //   popupBackground.classList.add("animated", "fadeIn");
-    // },
-
-    // HidePopUp(){
-    //   let popupBackground = document.querySelector("#PopupBackground");
-    //   let popupButtons = document.querySelector("#PopupConfirmButtons");
-    //   setTimeout( () => {
-    //     popupBackground.classList.remove("fadeIn", "animated");
-    //     popupBackground.classList.add("fadeOut", "animated");
-    //     setTimeout(() => {
-    //       popupBackground.classList.remove("animated", "fadeOut");
-    //       popupBackground.classList.add("invisible");
-    //       popupButtons.classList.add("invisible");
-    //       }, 200);
-    //   }, 1800);
-    // },
-
-    // PopUpConfirm(message){
-    //   let popupButtons = document.querySelector("#PopupConfirmButtons");
-    //   popupButtons.classList.remove("invisible");
-    //   this.PopUpMessage(message);
-    //   document.
-    // },
+  PopUpMessage(message = ''){
+    if (!message) message = this.Error.data ? 
+        this.Error.data : this.Success.data;
+    let popupBackground = this.$refs.Popup;
+    let popupMessage = this.$refs.PopupMessage;
+    popupMessage.innerHTML = message;
+    popupBackground.classList.remove("invisible");
+    popupBackground.classList.add("animated", "fadeIn");
+    setTimeout( () => {
+        popupBackground.classList.remove("fadeIn", "animated");
+        popupBackground.classList.add("fadeOut", "animated");
+        setTimeout(() => {
+        popupBackground.classList.remove("animated", "fadeOut");
+        popupBackground.classList.add("invisible");
+        }, 400);
+    }, 1600);
+  },
 
     SearchByTag(tag){
       this.$router.push({name:"Search", query: {search: tag}});
@@ -272,7 +267,7 @@ export default {
 
     async PinNote(event){
       await this[actionTypes.ACTION_PIN_NOTE] (event.target.id);
-      Popup.methods.PopUpMessage(this.Error, this.Success);
+      this.PopUpMessage();
       await this.GetNotes(true);
       await this.GetNotes();
       this.CheckEmptyPage();
@@ -284,7 +279,7 @@ export default {
 
     async CopyNote(event){
       await this[actionTypes.ACTION_COPY_NOTE] (event.target.id);
-      Popup.methods.PopUpMessage(this.Error, this.Success);
+      this.PopUpMessage();
       this.GetNotes(true);
       this.GetNotes();
     },
@@ -292,7 +287,7 @@ export default {
     async DeleteNote(event){
       if ( await this.ConfirmAction('Are you sure you want to delete this note?') ){
         await this[actionTypes.ACTION_DELETE_NOTE] (event.target.id);
-        Popup.methods.PopUpMessage(this.Error, this.Success);
+        this.PopUpMessage();
         await this.GetNotes(true);
         await this.GetNotes();
         this.CheckEmptyPage();
@@ -300,8 +295,9 @@ export default {
     },
 
     ScrollToTop(name){
-        document.querySelector("#"+name).scrollIntoView();
-        window.scrollBy(0, -(document.querySelector('#nav').offsetHeight));
+      this.$refs[name][0].scrollIntoView();
+      const rem = getComputedStyle(document.documentElement).fontSize;
+      window.scrollBy(0, - ((2 * rem.substring(0, rem.length-2)) + 60) );
     },
 
     CheckEmptyPage(){
@@ -424,44 +420,42 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@mixin flexcard($number){
+  flex: $number;
+  max-width: $number;
+  position: relative;
+  padding-bottom: 5rem;
+}
+
 @media(max-width:699px){
-  .FlexCard{
-    flex: 80%;
-    max-width: 80%;
-    position: relative;
-    padding-bottom: 3rem;
+  .flex-card{
+    @include flexcard(80%);
   }
 }
 
 @media(min-width:700px){
-  .FlexCard{
-    flex: 40%;
-    max-width: 40%;
-    position: relative;
-    padding-bottom: 5rem;
+  .flex-card{
+    @include flexcard(40%);
   }
 }
 
-.NoteManagementButtonsField{
+.note-management-buttons-field{
   height: 2rem;
   position: absolute;
   bottom:0.5rem;
   right: 0.5rem;
 }
 
-.NoteManagementButton{
-  width: 2rem;
-  height: 2rem;
+.note-management-button{
+  @include basic-button();
   margin-left:0.5rem;
-  background-size: cover;
+  &:hover{
+    background-color: $global-color;
+  }
 }
 
-.NoteManagementButton:hover{
-  background-color: turquoise;
-}
-
-.NoteTagsField{
+.note-tags-field{
   white-space: nowrap;
   overflow: scroll;
   width: 90%;
@@ -470,13 +464,12 @@ export default {
   left: 0%;
   margin-left: 5% !important;
   bottom: 3rem;
+  &::-webkit-scrollbar{
+    display: none;
+  }
 }
 
-.NoteTagsField::-webkit-scrollbar{
-  display: none;
-}
-
-.NoteTag{
+.note-tag{
   background-color: gray; 
   color: white;
   height: 1rem;
@@ -485,48 +478,61 @@ export default {
   padding: 0 0.2rem 0 0.2rem;
   text-align: right;
   cursor: pointer;
+  &:hover{
+    background-color: $global-color;
+    color: black;
+  }
 }
 
-.NoteTag:hover{
-  background-color: teal;
-}
-
-.NoteManagementButton_Pin{
-  background-image: url("../assets/pin.png");
+.note-management-button-pin{
+  background-image: url($pin_icon);
 
 }
-.NoteManagementButton_Edit{
-  background-image: url("../assets/edit.png");
+.note-management-button-edit{
+  background-image: url($edit_icon);
 }
-.NoteManagementButton_Copy{
-  background-image: url("../assets/copy.png");
+.note-management-button-copy{
+  background-image: url($copy_icon);
 }
-.NoteManagementButton_Delete{
-  background-image: url("../assets/delete.png");
+.note-management-button-delete{
+  background-image: url($delete_icon);
+  &:hover{
+    background-color: $global-error;
+  }
 }
-.NoteManagementButton_Unpin{
-  background-color: red;
-}
-.NoteManagementButton_Unpin:hover{
-  background-color: darkred;
+.note-management-button-unpin:hover{
+  background-color: $global-error;
 }
 
 .carousel, .carousel-slide{
     height: 20rem !important;
 }
 
-.paginationButton{
-  width: 2rem;
-  height: 2rem;
+.pagination-button{
+  @include basic-button();
   font-size: 1rem;
-  border-radius: 15%;
-  background-color: turquoise;
+  background-color: $global-color;
   color: black;
   line-height: 1rem;
+    &:hover{
+      background-color: black;
+      color: $global-color;
+    }
 }
 
-.paginationButton:hover{
-  background-color: black;
-  color: turquoise;
+#Popup{
+  width: fit-content;
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 1rem;
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color:whitesmoke;
+  border: 2px solid $global-color;
+  border-radius: 1rem;
+  padding: 0 1rem 0 1rem;
+  vertical-align: middle;
 }
 </style>

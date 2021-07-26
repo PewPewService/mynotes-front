@@ -1,9 +1,10 @@
 <template>
 <div class="w-100 h-100 my-auto">
     <div
-        class="login d-flex justify-content-around m-4 mobile"
-        id="WholeForm"
         v-if="!JWT"
+        id="WholeForm"
+        ref="WholeForm"
+        class="login d-flex justify-content-around m-4 mobile"
     >
         <div class="p-3 my-auto cursor-default">
             <p class="h1">Welcome to</p>
@@ -19,13 +20,15 @@
             >
                 <b-input
                     :id="input.id"
+                    :ref="input.id"
                     :type="input.type"
                     :placeholder="input.placeholder"
                     @keyup="CheckEnter"
                 />
                 <span
                     :id="'error'+input.id"
-                    class="InputError"
+                    :ref="'error'+input.id"
+                    class="input-error"
                 > </span>
             </div>
 
@@ -46,19 +49,19 @@
                     </a>
             </p> 
             <p>
-            <span class="mt-3 mb-5 InputError">
-                {{AuthError}}
-            </span>
-        </p>
+                <span class="mt-3 mb-5 input-error">
+                    {{AuthError}}
+                </span>
+            </p>
         </div>
     </div>
     <div
-        class="login d-flex justify-content-around m-4 mobile"
-        id="WholeForm"
         v-else
+        id="WholeForm"
+        class="login d-flex justify-content-around p-5 m-4 mobile border rounded shadow"
     >
         Hi, {{USER}}!
-        <input type="button" @click="LogOut" value="logout">
+        <b-button @click="LogOut"> logout </b-button>
     </div>
 </div>
 </template>
@@ -66,6 +69,8 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import { actionTypes, getterTypes, moduleName } from '../store/modules/auth';
+import "../utils/validation/email";
+import { VerifyEmail } from '../utils/validation/email';
 export default {
     data(){
         return{
@@ -119,12 +124,6 @@ export default {
         }
     },
 
-    created(){
-        this.UserInputs = this.LoginForm;
-        this[actionTypes.ACTION_CHECK_COOKIE]();
-        this[actionTypes.ACTION_CLEAR_RESPONSES]();
-    },
-
     computed: {
         ...mapGetters(moduleName, [
             getterTypes.GETTER_AUTH_ERROR,
@@ -140,6 +139,12 @@ export default {
         USER(){
             return this[getterTypes.GETTER_USER];
         }
+    },
+
+    created(){
+        this.UserInputs = this.LoginForm;
+        this[actionTypes.ACTION_CHECK_COOKIE]();
+        this[actionTypes.ACTION_CLEAR_RESPONSES]();
     },
 
     methods:{
@@ -168,7 +173,7 @@ export default {
                 fadeIn = "fadeInUp";
                 fadeOut = "fadeOutUp";
             }
-            let Form = document.getElementById("WholeForm"); 
+            let Form = this.$refs.WholeForm;
             Form.classList.remove("animated", "fadeInDown", "fadeInUp");
             Form.classList.add("animated", fadeOut);
             setTimeout(() => {
@@ -181,27 +186,17 @@ export default {
 
         CheckEmail(emailField){
             let email = emailField.value.trim();
-            let error = document.querySelector('#error'+emailField.id);
-            if (!email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
-                error.innerHTML = "invalid email!";
-                return false;
-            }
-            else {
-                error.innerHTML = "";
-                return email;
-            }
+            let error = this.$refs['error' + emailField.id][0];
+            return VerifyEmail(email, error)
         },
+        
         CheckUsername(userField){
             let username = userField.value.trim();
-            let error = document.querySelector("#error"+userField.id);
+            let error = this.$refs['error' + userField.id][0];
             if (!username){
                 error.innerHTML = "this field cannot be empty!";
                 return false;
             }
-            /*else if (username.length > 15){
-                error.innerHTML = "username should be 15 characters or less!";
-                return false;
-            }*/
             else {
                 error.innerHTML = "";
                 return username;
@@ -209,7 +204,7 @@ export default {
         },
         CheckPassword (passwordField){
             let password = passwordField.value.trim();
-            let error = document.querySelector("#error"+passwordField.id);
+            let error = this.$refs['error' + passwordField.id][0];
             if (!password){
                 error.innerHTML = "this field cannot be empty!"
                 return false;
@@ -223,9 +218,9 @@ export default {
         CheckPasswords(passwordField, passwordRepeatField){
             let password = this.CheckPassword(passwordField);
             let passwordRepeat = this.CheckPassword(passwordRepeatField);
-            let error = document.querySelector("#error"+passwordRepeatField.id);
+            let error = this.$refs['error' + passwordRepeatField.id][0];
             if (!(password === passwordRepeat)){
-                error.innerHTML+=" passwords have to be identical!";
+                error.innerHTML += "Passwords have to be identical!";
                 return true;
             }
             else{
@@ -235,10 +230,10 @@ export default {
         },
 
         RegisterVerify(){
-            let usernameField = document.querySelector("#RegisterUsername");
-            let emailField = document.querySelector("#RegisterEmail");
-            let passwordField = document.querySelector("#RegisterPassword");
-            let passwordRepeatField = document.querySelector("#RegisterPasswordRepeat");
+            let usernameField = this.$refs.RegisterUsername[0].$el;
+            let emailField = this.$refs.RegisterEmail[0].$el;
+            let passwordField =  this.$refs.RegisterPassword[0].$el;
+            let passwordRepeatField = this.$refs.RegisterPasswordRepeat[0].$el;
             
             let username = this.CheckUsername(usernameField);
             let email = this.CheckEmail(emailField);
@@ -253,8 +248,8 @@ export default {
         },
 
         LoginVerify(){
-            let userField = document.querySelector("#LoginUsername");
-            let passwordField = document.querySelector("#LoginPassword");
+            let userField = this.$refs.LoginUsername[0].$el;
+            let passwordField = this.$refs.LoginPassword[0].$el;
             let username = this.CheckUsername(userField);
             let password = this.CheckPassword(passwordField);
             if (!(username && password)) return;
@@ -278,9 +273,6 @@ export default {
     .w-50{
         width: 100% !important;
         align-self: center;
-    }
-    .w-75{
-        width: 100% !important;
     }
 }
 .h-100{

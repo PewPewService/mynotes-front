@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { NotesApi, getCookie } from './connectionString';
+import {getCookie} from '../../utils/cookie control/cookie.js';
 export const moduleName = 'notesModule';
 
 export const actionTypes = {
@@ -53,7 +53,7 @@ export default {
             commit (mutationTypes.MUTATION_CLEAR_RESPONSE);
             try{
                 const jwt = getCookie('jwt');
-                const response = await axios.post(NotesApi+'createNote', {note:note, jwt:jwt});
+                const response = await axios.post(process.env.VUE_APP_NOTES_API+'createNote', {note:note, jwt:jwt});
                 commit (mutationTypes.MUTATION_NOTE_RESPONSE_SUCCESS, response);
             }
             catch (err) {
@@ -65,7 +65,7 @@ export default {
             commit (mutationTypes.MUTATION_CLEAR_RESPONSE);
             try{
                 const jwt = getCookie('jwt');
-                const response = await axios.post(NotesApi+'pinNote/'+noteId, {jwt: jwt});
+                const response = await axios.post(process.env.VUE_APP_NOTES_API+'pinNote/'+noteId, {jwt: jwt});
                 commit (mutationTypes.MUTATION_NOTE_RESPONSE_SUCCESS, response);
             }
             catch (err) {
@@ -77,7 +77,7 @@ export default {
             commit (mutationTypes.MUTATION_CLEAR_RESPONSE);
             try{
                 const jwt = getCookie('jwt');
-                const response = await axios.post(NotesApi+'duplicateNote/'+noteId, {jwt: jwt});
+                const response = await axios.post(process.env.VUE_APP_NOTES_API+'duplicateNote/'+noteId, {jwt: jwt});
                 commit (mutationTypes.MUTATION_NOTE_RESPONSE_SUCCESS, response);
             }
             catch (err) {
@@ -89,7 +89,7 @@ export default {
             commit (mutationTypes.MUTATION_CLEAR_RESPONSE);  
             try{
                 const jwt = getCookie('jwt');
-                const response = await axios.post(NotesApi+'deleteNote/'+noteId, {jwt: jwt});
+                const response = await axios.post(process.env.VUE_APP_NOTES_API+'deleteNote/'+noteId, {jwt: jwt});
                 commit (mutationTypes.MUTATION_NOTE_RESPONSE_SUCCESS, response);
             }
             catch (err) {
@@ -103,7 +103,7 @@ export default {
                 console.log(noteId);
                 if (noteId){
                     const jwt = getCookie('jwt');
-                    const response = await axios.post(NotesApi+'getNote/'+noteId, {jwt: jwt});
+                    const response = await axios.post(process.env.VUE_APP_NOTES_API+'getNote/'+noteId, {jwt: jwt});
                     commit (mutationTypes.MUTATION_FOUND_NOTE, response.data);
                 }
                 else commit(mutationTypes.MUTATION_CLEAR_NOTE);
@@ -118,7 +118,7 @@ export default {
             commit (mutationTypes.MUTATION_CLEAR_RESPONSE);
             try{
                 const jwt = getCookie('jwt');
-                const response = await axios.post(NotesApi+'editNote', {note:note, jwt:jwt});
+                const response = await axios.post(process.env.VUE_APP_NOTES_API+'editNote', {note:note, jwt:jwt});
                 commit (mutationTypes.MUTATION_NOTE_RESPONSE_SUCCESS, response);
             }
             catch (err) {
@@ -130,7 +130,7 @@ export default {
             commit (mutationTypes.MUTATION_CLEAR_RESPONSE);
             try{
                 const jwt = getCookie('jwt');
-                const notes = await axios.post(NotesApi+'getNotes/', {jwt: jwt, queryString: data.queryString, pinned: data.pinned, page: data.page});
+                const notes = await axios.post(process.env.VUE_APP_NOTES_API+'getNotes/', {jwt: jwt, queryString: data.queryString, pinned: data.pinned, page: data.page});
                 if (data.pinned) commit(mutationTypes.MUTATION_SET_PINNED_NOTES, notes.data);
                 else commit(mutationTypes.MUTATION_SET_OTHER_NOTES, notes.data);
             }

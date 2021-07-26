@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomePage from '../views/HomePage.vue'
+import NotesPage from '../views/NotesPage.vue'
 
 Vue.use(VueRouter)
 
@@ -8,11 +8,11 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('../views/RegistrationForm.vue')
+    component: () => import('../views/LoginPage.vue')
   },
 
   {
-    path: '/registration',
+    path: '/register',
     name: 'Registration',
     redirect: '/login'
   },
@@ -20,25 +20,25 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: HomePage
+    component: NotesPage
   },
 
   {
     path: '/note/create',
     name: 'NoteCreation',
-    component: () => import('../views/NoteCreationForm.vue')
+    component: () => import('../views/NoteEditingPage.vue')
   },
 
   {
     path: '/note/edit',
     name: 'NoteEditing',
-    component: () => import('../views/NoteCreationForm.vue')
+    component: () => import('../views/NoteEditingPage.vue')
   },
 
   {
     path: '/search',
     name: 'Search',
-    component: HomePage
+    component: NotesPage
   }
 ]
 

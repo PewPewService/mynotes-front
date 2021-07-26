@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { UsersApi, setCookie, delCookie, getCookie } from './connectionString';
+import {setCookie, delCookie, getCookie} from '../../utils/cookie control/cookie.js';
 export const moduleName = 'authModule';
 
 
@@ -41,7 +41,7 @@ export default{
         async [actionTypes.ACTION_LOGIN] ({commit}, userData){
             commit(mutationTypes.MUTATION_CLEAR_RESPONSES);
             try {
-                const response = await axios.post(UsersApi+"login", userData);
+                const response = await axios.post(process.env.VUE_APP_USERS_API + "login", userData);
                 delCookie('jwt');
                 delCookie('user');
                 if (response.status == 200){
@@ -59,7 +59,7 @@ export default{
         async [actionTypes.ACTION_REGISTER] ({commit}, userData){
             commit(mutationTypes.MUTATION_CLEAR_RESPONSES);
             try{
-                const response = await axios.post(UsersApi+"register", userData);
+                const response = await axios.post(process.env.VUE_APP_USERS_API + "register", userData);
                 delCookie('jwt');
                 delCookie('user');
                 if (response.status == 200) {
