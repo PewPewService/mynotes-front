@@ -4,7 +4,7 @@
             <p class="mt-3 w-75 text mx-auto font-weight-bold h2 mb-5">
                 {{ FoundNote.id ? 'Edit the note' : 'Add a note' }}
             </p>
-            <b-form @submit="ImagesToBase64">
+            <b-form @submit="CreateForm">
                 <b-form-group
                     label="Name of the note:"
                     label-for="NoteName"
@@ -203,13 +203,15 @@ export default {
             }
         },
 
-        ImagesToBase64(){
+        CreateForm(){
             let images = this.$refs.NoteImages.files;
             let form = new FormData;
             form.append('id', this.FoundNote.id);
             form.append('name', this.FoundNote.name);
             form.append('text', this.FoundNote.text);
-            form.append('tags', this.FoundNote.tags);
+            for (let tag of this.FoundNote.tags){
+                form.append('tags', tag);
+            }
             for (let image of images) {
                 form.append('images', image);
             }
