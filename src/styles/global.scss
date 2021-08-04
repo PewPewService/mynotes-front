@@ -1,35 +1,5 @@
-@mixin input-response($color){
-  color: $color;
-  font-weight: bold;
-  font-size: 1rem;
-  font-style: italic;
-}
-
-@mixin basic-button{
-  width: 2rem;
-  height: 2rem;
-  border-radius: 15%;
-  background-size: cover;
-}
-
 html{
   scroll-behavior: smooth;
-}
-
-@media(max-width:699px){
-  #SearchBar{
-    display: block;
-    width: 90% !important;
-  }
-  .w-75{
-    width: 100% !important;
-  }
-}
-
-@media(min-width:700px){
-  #SearchBar{
-    display: inline-block;
-  }
 }
 
 #app {
@@ -49,11 +19,6 @@ html{
   position: fixed;
 }
 
-.site-content{
-  padding-top: calc(2rem + 60px);
-  z-index: 10;
-}
-
 #nav a {
   font-weight: bold;
   color: #2c3e50;
@@ -61,6 +26,11 @@ html{
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+.site-content{
+  padding-top: calc(2rem + 60px);
+  z-index: 10;
 }
 
 .cursor-pointer{
@@ -76,7 +46,7 @@ html{
   width: calc(100% - 2rem) !important;
 }
 
-.custom-input-button{
+.custom-input_button{
   width: 1.5rem !important;
   background-image: url($search_icon);
   background-repeat: round;
@@ -90,11 +60,6 @@ html{
   align-items: center;
   vertical-align: middle;
 }
-
-.active{
-  display: flex !important;
-}
-
 .carousel-item img{
   width: auto !important;
   max-width: 100% !important;
@@ -108,14 +73,38 @@ html{
   background-size: contain;
 }
 
-.input-error{
+.input_error{
   @include input-response($global-error);
 }
 
-.input-success{
+.input_success{
   @include input-response($global-color);
 }
 
 .invisible{
   display: none;
+}
+
+.active{
+  display: flex !important;
+}
+
+.spinner{
+  color: $global-color;
+}
+
+@media(max-width:699px){
+  #SearchBar{
+    display: block;
+    width: 90% !important;
+  }
+  .w-75{
+    width: 100% !important;
+  }
+}
+
+@media(min-width:700px){
+  #SearchBar{
+    display: inline-block;
+  }
 }

@@ -35,11 +35,11 @@
             type="text"
             class="d-inline custom-input"
             placeholder="search"
-            @keyup="CheckEnter"
+            @keyup.enter="searchNotes"
           />
           <b-input-group-append class="d-inline">
             <b-button 
-              class="custom-input custom-input-button"
+              class="custom-input custom-input_button"
               @click="searchNotes"
             />
           </b-input-group-append>
@@ -54,7 +54,7 @@
 
 <script>
 import { moduleName as AuthModule, getterTypes as AuthGetters, actionTypes as AuthActions} from "./store/modules/auth";
-import { moduleName as NotesModule, /*getterTypes as NotesGetters,*/ actionTypes as NotesActions} from "./store/modules/notes";
+import { moduleName as NotesModule, actionTypes as NotesActions} from "./store/modules/notes";
 import { mapActions, mapGetters } from "vuex";
 
 export default{
@@ -80,7 +80,6 @@ export default{
 
   methods: {
     ...mapActions(AuthModule, [
-        AuthActions.ACTION_LOGOUT,
         AuthActions.ACTION_CHECK_COOKIE
     ]),
     ...mapActions(NotesModule, [
@@ -88,24 +87,18 @@ export default{
         NotesActions.ACTION_CLEAR_NOTE,
     ]),
 
-    CheckEnter(e){
-        if (e.keyCode == 13){
-          this.searchNotes();
-        }
-    },
-
-    async GetNotes(pinned=false, page=1){
+    async GetNotes(pinned = false, page = 1){
       let searchQuery = this.$route.query.search;
       await this[NotesActions.ACTION_GET_NOTES]({
         pinned: pinned,
-        page: page-1,
+        page: page - 1,
         queryString: searchQuery ? searchQuery : ''
       });
     },
     searchNotes(){
       let Searchable = this.$refs.SearchInput.$el.value;
       let routeName = this.$route.name;
-      this.$router.push({name:"Search", query: {search: Searchable}});
+      this.$router.push({name:"Search", query: {search: Searchable} });
       if (routeName == "Home" || routeName == "Search"){
         this.GetNotes();
         this.GetNotes(true);
@@ -120,10 +113,6 @@ export default{
     CreateNotePage(){
       this[NotesActions.ACTION_CLEAR_NOTE]();
     },
-
-    logout(){
-      this[AuthActions.ACTION_LOGOUT]();
-    }
   },
 };
 </script>
