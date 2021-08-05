@@ -119,7 +119,7 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color:whitesmoke;
-  border: 2px solid $global-color;
+  border: 2px solid black;
   border-radius: 1rem;
   padding: 0 1rem 0 1rem;
   vertical-align: middle;

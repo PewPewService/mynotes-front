@@ -72,6 +72,7 @@
                                     class="custom-file-input cursor-pointer"
                                     ref="NoteImages"
                                     aria-describedby="NoteImages"
+                                    accept='image/jpg, image/jpeg, image/png'
                                     @change="ImageOnload"
                                 >
                                 <label
@@ -210,7 +211,7 @@ export default {
             form.append('name', this.FoundNote.name);
             form.append('text', this.FoundNote.text);
             for (let tag of this.FoundNote.tags){
-                form.append('tags', tag);
+                form.append('tags', tag); 
             }
             for (let image of images) {
                 form.append('images', image);
