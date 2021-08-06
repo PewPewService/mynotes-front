@@ -195,7 +195,8 @@ export default {
             return VerifyLength(formInput.data);
         },
 
-        SubmitForm(){
+        SubmitForm(e){
+            e.preventDefault();
             if (this.UserInputs.name === this.LoginForm.name) {
                 this[actionTypes.ACTION_LOGIN](this.LoginData);
             }
