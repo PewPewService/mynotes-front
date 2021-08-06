@@ -1,14 +1,10 @@
 # mynotes-frontend
 
-## heroku
+## netlify
 ```
-nothing yet
+https://quirky-swirles-3f713f.netlify.app/
 ```
 ## backend-git:
 ```
 https://github.com/PewPewService/MyNotesBackEnd
-```
-## backend-hosting:
-```
-nothing yet
 ```
