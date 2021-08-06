@@ -52,7 +52,7 @@
     </div>
 
     <div
-      :hidden="!Note.tags.length"
+      :hidden="!Note.tags || !Note.tags.length"
       class="note-tags-field mx-auto"
     >
       <span
@@ -88,6 +88,7 @@ export default {
       ]),        
 
       connectionString(image){
+        console.log(this[getterTypes.GETTER_CONNECTION_STRING] + image);
         return this[getterTypes.GETTER_CONNECTION_STRING] + image;
       },
 
